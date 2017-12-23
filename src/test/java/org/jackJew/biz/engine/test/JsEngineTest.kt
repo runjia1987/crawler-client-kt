@@ -9,14 +9,13 @@ import org.junit.Test
 import com.google.gson.JsonObject
 
 /**
- * when max is below 50, Rhino is better than Nashorn;
+ * when MAX is below 50, Rhino is better than Nashorn;
  * <br></br>
- * when max is 100, Nashorn is better than Rhino.
+ * when MAX is 100, Nashorn is better than Rhino.
  * @author Jack
  */
+const val MAX = 200
 class JsEngineTest {
-
-  private val max = 20
 
   @Test
   fun testNashornJS() {
@@ -33,10 +32,9 @@ class JsEngineTest {
 
       val startTime = System.currentTimeMillis()
       var i = 0
-      while (i < max) {
+      while (i < MAX) {
         val result = JsEngineNashorn.INSTANCE.runScript2JSON(
-            String.format("(function(args){%s})(%s);", script, config.toString())
-        )
+            "(function(args){$script})($config);")
         if (i++ == 0) {
           println(result)
         }
@@ -59,9 +57,9 @@ class JsEngineTest {
 
       val startTime = System.currentTimeMillis()
       var i = 0
-      while (i < max) {
+      while (i < MAX) {
         val result = JsEngineRhino.INSTANCE.runScript2JSON(
-            String.format("(function(args){%s})(%s);", script, config.toString()))
+            "(function(args){$script})($config);")
         if (i++ == 0) {
           println(result)
         }

@@ -48,11 +48,11 @@ class ResponseConverter {
     }
     if (!charsetObserverNotify.found) {
       nsDetector.probableCharsets.also {
-        if (it.size > 0) charsetObserverNotify.charset = it[0]
+        if (it.isNotEmpty()) charsetObserverNotify.charset = it[0]
       }
     }
     return charsetObserverNotify.charset?.let {
-      String(bous.toByteArray(), Charset.forName(charset))
+      String(bous.toByteArray(), Charset.forName(it))
     } ?: String(bous.toByteArray())
   }
 

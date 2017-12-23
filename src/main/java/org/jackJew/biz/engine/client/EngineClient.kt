@@ -34,38 +34,40 @@ class EngineClient {
       it.isAutomaticRecoveryEnabled = true
       it.isTopologyRecoveryEnabled = true
     }
-  }
 
-  fun main(args: Array<String>) {
-    if (args.isEmpty()) {
-      println("clientName is required.")
-      exitProcess(1)
-    }
-    CLIENT_NAME = args[0]
-    logger.info("$CLIENT_NAME is starting... on queue $queueName")
-
-    val conn = CONN_FACTORY.newConnection(pool)
-    val channel = conn.createChannel()
-    channel.basicQos(threadPoolSize, false)
-
-    val consumer = object: DefaultConsumer(channel) {
-      override fun handleDelivery(consumerTag: String, envelope: Envelope,
-                                  properties: AMQP.BasicProperties, body: ByteArray) {
-        Task(body).process()
-        channel.basicAck(envelope.deliveryTag, false)
+    @JvmStatic
+    fun main(args: Array<String>) {
+      if (args.isEmpty()) {
+        println("Error: argument is required to indicate `clientName`.")
+        exitProcess(1)
       }
+      CLIENT_NAME = args[0]
+      logger.info("$CLIENT_NAME is starting... on queue $queueName")
 
-      override fun handleCancel(consumerTag: String) =
-          logger.error("$CLIENT_NAME consumer on queue $queueName get cancel signal.")
+      val conn = CONN_FACTORY.newConnection(pool)
+      val channel = conn.createChannel()
+      channel.basicQos(threadPoolSize, false)
+
+      val consumer = object: DefaultConsumer(channel) {
+        override fun handleDelivery(consumerTag: String, envelope: Envelope,
+                                    properties: AMQP.BasicProperties, body: ByteArray) {
+          Task(body).process()
+          channel.basicAck(envelope.deliveryTag, false)
+        }
+
+        override fun handleCancel(consumerTag: String) =
+            logger.error("$CLIENT_NAME consumer on queue $queueName get cancel signal.")
+      }
+      channel.basicConsume(queueName, false, consumer)
+      // add hook when process exits or is interrupted.
+      Runtime.getRuntime().addShutdownHook(thread {
+        conn.close()
+        MessagePushService.INSTANCE.connection.close()
+        ScriptCacheService.INSTANCE.connection.close()
+        pool.shutdownNow()
+      })
+      logger.info("$CLIENT_NAME is started.")
     }
-    channel.basicConsume(queueName, false, consumer)
-    // add hook when process exits or is interrupted.
-    Runtime.getRuntime().addShutdownHook(thread {
-      conn.close()
-      MessagePushService.INSTANCE.connection.close()
-      ScriptCacheService.INSTANCE.connection.close()
-      pool.shutdownNow()
-    })
-    logger.info("$CLIENT_NAME is started.")
   }
+
 }

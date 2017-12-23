@@ -66,17 +66,19 @@ class HttpEngineAdapter {
         .setConnectTimeout(timeout)
         .build()
     config.getOrPut(CONFIG_KEY_USER_AGENT, { DEFAULT_USER_AGENT })
+    val host = config.remove(CONFIG_KEY_PROXY_HOST)
+    val port = config.remove(CONFIG_KEY_PROXY_PORT)
 
     return HttpClients.custom()
         .setConnectionManager(connectionManager)
         .setConnectionManagerShared(true)
         .addInterceptorFirst(CustomHttpRequestInterceptor(config))
         .setDefaultRequestConfig(requestConfig)
-        .setProxy(
-            HttpHost(config.remove(CONFIG_KEY_PROXY_HOST)!!,
-                Integer.valueOf(config.remove(CONFIG_KEY_PROXY_PORT)!!)))
         .setRetryHandler(DefaultHttpRequestRetryHandler(0, false))
-        .build()
+        .run {
+          host?.also { setProxy(HttpHost(host, port!!.toInt())) }
+          build()
+        }
   }
 
   operator fun get(url: String) = get(url, mapOf(), mapOf())
@@ -127,7 +129,7 @@ class HttpEngineAdapter {
     }
     if (lastException is HttpHostConnectException)
       throw lastException
-    throw HttpException("request fail $url")
+    throw HttpException("request fail $url", lastException)
   }
 
   private fun convertResponse(response: CloseableHttpResponse, charset: String?): ResponseConverter {
