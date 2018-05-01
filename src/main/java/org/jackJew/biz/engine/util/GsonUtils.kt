@@ -41,5 +41,5 @@ class IOUtils {
 
 class ValidationException(message: String): RuntimeException(message) {
 
-  override @Synchronized fun fillInStackTrace(): Throwable  = this
+  @Synchronized override fun fillInStackTrace(): Throwable  = this
 }

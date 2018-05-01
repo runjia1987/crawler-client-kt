@@ -31,27 +31,25 @@ import java.util.HashMap
 class HttpEngineAdapter {
 
   companion object {
-    val CONFIG_BIZ_TYPE = "bizType"
-    val CONFIG_HEADER_CHARSET = "charset"
-    val CONFIG_KEY_PROXY_HOST = "proxyHost"
-    val CONFIG_KEY_PROXY_PORT = "proxyPort"
+    const val CONFIG_BIZ_TYPE = "bizType"
+    const val CONFIG_HEADER_CHARSET = "charset"
+    const val CONFIG_KEY_PROXY_HOST = "proxyHost"
+    const val CONFIG_KEY_PROXY_PORT = "proxyPort"
 
-    private val max_retry_times = 3
-    private val connectionManager = PoolingHttpClientConnectionManager()
+    private const val max_retry_times = 3
+    private val connectionManager = PoolingHttpClientConnectionManager().apply {
+      maxTotal = 200
+      defaultMaxPerRoute = 200
+    }
 
-    private val CONFIG_KEY_USER_AGENT = "User-Agent"
+    private const val CONFIG_KEY_USER_AGENT = "User-Agent"
     private val DEFAULT_USER_AGENT = PropertyReader.getProperty(CONFIG_KEY_USER_AGENT)!!
-    private val DEFAULT_TIMEOUT = 30000
-    private val LONG_TIMEOUT = 50000
+    private const val DEFAULT_TIMEOUT = 30000
+    private const val LONG_TIMEOUT = 50000
     private val LONG_TIME_BIZ_TYPES = PropertyReader.getProperty("Long-Time-BizTypes")?.split(",") ?: listOf()
 
     private val log = LoggerFactory.getLogger(HttpEngineAdapter::class.java)!!
     val INSTANCE by lazy { HttpEngineAdapter() }
-  }
-
-  private constructor() {
-    connectionManager.maxTotal = 200
-    connectionManager.defaultMaxPerRoute = 200
   }
 
   private fun createHttpClient(config: MutableMap<String, String>): CloseableHttpClient {
@@ -81,7 +79,7 @@ class HttpEngineAdapter {
         }
   }
 
-  operator fun get(url: String) = get(url, mapOf(), mapOf())
+  fun get(url: String) = get(url, mapOf(), mapOf())
 
   fun get(url: String, config: Map<String, String>, headers: Map<String, String>) =
     HttpGet(url).run {
@@ -132,24 +130,17 @@ class HttpEngineAdapter {
     throw HttpException("request fail $url", lastException)
   }
 
-  private fun convertResponse(response: CloseableHttpResponse, charset: String?): ResponseConverter {
-    val responseConverter = ResponseConverter().also { it.charset = charset }
-    try {
-      val status = response.statusLine
-      responseConverter.statusCode = status.statusCode
+  private fun convertResponse(response: CloseableHttpResponse, _charset: String?) =
+    ResponseConverter().apply {
+      charset = _charset
+      statusCode = response.statusLine?.statusCode ?: 0
 
-      val headers = response.allHeaders
-      val headersMap = HashMap<String, String>()
-      responseConverter.headers = headersMap
-      headers ?.run {
-        forEach { headersMap.put(it.name, it.value) }
-      }
-      responseConverter.bytes = IOUtils.getBytes(response.entity.content)
-    } catch (ex: Exception) {
-      // swallow
+      headers = response.allHeaders
+          ?.associate { Pair(it.name, it.value) }
+          ?: mapOf()
+
+      bytes = IOUtils.getBytes(response.entity.content)
     }
-    return responseConverter
-  }
 }
 
 /**

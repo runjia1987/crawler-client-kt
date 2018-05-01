@@ -54,7 +54,7 @@ class ScriptCacheService {
         bizScript.bizType?.also {
           logger.info("received script update-msg for $it")
           if (bizScript.isDeleted)
-            cache.put(it, DEPRECATED)
+            cache[it] = DEPRECATED
           else
             bizScript.script?.run { cache.put(it, this) }
           logger.info("cached script update-msg for $it")
@@ -73,7 +73,7 @@ class ScriptCacheService {
         else {
           logger.info("start getByHttp of bizType: $bizType")
           getByHttp(bizType)?.apply {
-            cache.put(it, this)
+            cache[it] = this
           }
         }
       }

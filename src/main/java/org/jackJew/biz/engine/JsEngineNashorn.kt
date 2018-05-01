@@ -91,7 +91,7 @@ class JsEngineNashorn: JsEngine {
       val value = objectMirror[key]
       when(value) {
         is ScriptObjectMirror -> {
-          if (value.isArray) objectMirror.put(key, value.values)
+          if (value.isArray) objectMirror[key] = value.values
           transform(value) // we assume that the depth of recursion is tolerable
         }
       }
