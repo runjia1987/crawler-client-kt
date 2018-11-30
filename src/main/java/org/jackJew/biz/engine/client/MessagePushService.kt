@@ -17,7 +17,7 @@ class MessagePushService {
   val connection = EngineClient.CONN_FACTORY.newConnection()!!
   private val replyQueue = LinkedBlockingQueue<Reply>()
 
-  private constructor() {
+  init {
     val channel = connection.createChannel()
     Thread(Runnable {
       while (true) {

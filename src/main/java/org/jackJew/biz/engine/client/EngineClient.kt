@@ -24,7 +24,7 @@ class EngineClient {
     var CLIENT_NAME: String = ""
 
     private val threadPoolSize = Integer.valueOf(PropertyReader.getProperty("threadPoolSize"))
-    val pool  =ThreadPoolExecutor(threadPoolSize, threadPoolSize,
+    private val pool  =ThreadPoolExecutor(threadPoolSize, threadPoolSize,
         0L, TimeUnit.SECONDS, LinkedBlockingQueue())
     private val mqFactoryUri = PropertyReader.getProperty("mqFactoryUri")
     private val queueName = PropertyReader.getProperty("queueName")

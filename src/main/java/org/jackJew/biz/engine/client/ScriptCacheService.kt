@@ -28,7 +28,7 @@ class ScriptCacheService {
     val SCRIPT_EXCHANGE = PropertyReader.getProperty("script_exchange")!!
     val QUERY_SCRIPT_URL = PropertyReader.getProperty("query_script_url")!!
     private val DEFAULT_USER_AGENT = PropertyReader.getProperty("User-Agent")
-    val DEPRECATED = "000"
+    const val DEPRECATED = "000"
     /**
      * shared httpclient since the route will never change.
      */
@@ -40,7 +40,7 @@ class ScriptCacheService {
   val cache = ConcurrentHashMap<String, String>()
   val connection = EngineClient.CONN_FACTORY.newConnection()!!
 
-  private constructor() {
+  init {
     val channel = connection.createChannel()
     channel.exchangeDeclarePassive(SCRIPT_EXCHANGE)
     val queueName = channel.queueDeclare(UUID.randomUUID().toString(), true, true, true, null).queue

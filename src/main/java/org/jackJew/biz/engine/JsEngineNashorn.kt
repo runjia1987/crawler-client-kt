@@ -27,7 +27,7 @@ class JsEngineNashorn: JsEngine {
     private val classWhiteList = mutableSetOf<String>()
     private val packageWhiteList = mutableSetOf<String>()
 
-    val CONFIG_PACKAGE = "org/jackJew/biz/engine/config/nashorn/"
+    const val CONFIG_PACKAGE = "org/jackJew/biz/engine/config/nashorn/"
 
     val INSTANCE by lazy { JsEngineNashorn() }
 
@@ -55,7 +55,7 @@ class JsEngineNashorn: JsEngine {
   private val scriptEngine = NashornScriptEngineFactory().scriptEngine as NashornScriptEngine
   private val scriptContext = SimpleScriptContext()
 
-  private constructor() {
+  init {
     SimpleBindings().also {
       it["\$\$http"] = HttpEngineAdapter.INSTANCE
       it["\$\$system"] = SystemUtil.INSTANCE

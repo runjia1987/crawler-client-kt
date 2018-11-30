@@ -24,7 +24,7 @@ class JsEngineRhino: JsEngine {
 
     var globalContextFactory: ContextFactory
     var sharedScriptObject: ScriptableObject
-    private val CONFIG_PACKAGE = "org/jackJew/biz/engine/config/rhino/"
+    private const val CONFIG_PACKAGE = "org/jackJew/biz/engine/config/rhino/"
 
     val INSTANCE by lazy { JsEngineRhino() }
     init {
@@ -65,7 +65,7 @@ class JsEngineRhino: JsEngine {
     }
   }
 
-  private constructor() {
+  init {
     Thread.currentThread().contextClassLoader.also {
       it.getResourceAsStream(CONFIG_PACKAGE + "json_util.js").use {
         runScript(IOUtils.toString(it, JsEngine.DEFAULT_CHARSET))
