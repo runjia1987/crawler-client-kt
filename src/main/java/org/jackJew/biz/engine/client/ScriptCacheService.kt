@@ -13,7 +13,7 @@ import org.jackJew.biz.task.BizScript
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -26,7 +26,7 @@ class ScriptCacheService {
   companion object {
     val logger = LoggerFactory.getLogger(ScriptCacheService::class.java)!!
     val SCRIPT_EXCHANGE = PropertyReader.getProperty("script_exchange")!!
-    val QUERY_SCRIPT_URL = PropertyReader.getProperty("query_script_url")!!
+    val QUERY_SCRIPT_URL = PropertyReader.getProperty("biz_script_url")!!
     private val DEFAULT_USER_AGENT = PropertyReader.getProperty("User-Agent")
     const val DEPRECATED = "000"
     /**

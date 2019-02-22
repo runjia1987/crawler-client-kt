@@ -22,7 +22,7 @@ class IOUtils {
     fun toString(ins: InputStream, charset: Charset) =
       StringBuilder(1 shl 8).also {
         val buff = ByteArray(1 shl 8)
-        var count = -1
+        var count: Int
         while (ins.read(buff).let { count = it; count != -1 }) {
           it.append(String(buff, 0, count, charset))
         }
@@ -31,7 +31,7 @@ class IOUtils {
     fun getBytes(ins: InputStream) =
         ByteArrayOutputStream(1 shl 8).also {
           val buff = ByteArray(1 shl 8)
-          var count = -1
+          var count: Int
           while (ins.read(buff).let { count = it; count != -1 }) {
             it.write(buff, 0, count)
           }
