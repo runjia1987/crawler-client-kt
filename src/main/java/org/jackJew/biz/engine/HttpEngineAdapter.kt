@@ -22,7 +22,6 @@ import org.jackJew.biz.engine.util.IOUtils
 import org.jackJew.biz.engine.util.PropertyReader
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.util.HashMap
 
 /**
  * http adapter (safe singleton for concurrency usage), based on HttpClient 4.4.1 library.
@@ -84,7 +83,7 @@ class HttpEngineAdapter {
   fun get(url: String, config: Map<String, String>, headers: Map<String, String>) =
     HttpGet(url).run {
       headers.forEach { addHeader(it.key, it.value) }
-      processResponse(config, this, url)
+      doProcess(config, this, url)
     }
 
   fun post(url: String, params: Map<String, String>?) =
@@ -99,12 +98,12 @@ class HttpEngineAdapter {
       entity = UrlEncodedFormEntity(arrayListOf<NameValuePair>().apply {
         params.forEach { add(BasicNameValuePair(it.key, it.value)) }
       })
-      processResponse(config, this, url)
+      doProcess(config, this, url)
     }
 
-  private fun processResponse(config: Map<String, String>,
-                              request: HttpUriRequest,
-                              url: String): ResponseConverter {
+  private fun doProcess(config: Map<String, String>,
+                        request: HttpUriRequest,
+                        url: String): ResponseConverter {
     var lastException: Exception? = null
     var i = 0
     while (i < max_retry_times) {

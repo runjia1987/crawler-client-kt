@@ -60,7 +60,7 @@ class EngineClient {
       }
       channel.basicConsume(queueName, false, consumer)
       // add hook when process exits or is interrupted.
-      Runtime.getRuntime().addShutdownHook(thread {
+      Runtime.getRuntime().addShutdownHook(thread(false) {
         conn.close()
         MessagePushService.INSTANCE.connection.close()
         ScriptCacheService.INSTANCE.connection.close()
